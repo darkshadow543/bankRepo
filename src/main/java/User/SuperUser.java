@@ -1,28 +1,41 @@
 package User;
 
+import java.util.ArrayList;
+
+import DOA.AccountOracle;
+import DOA.DAO;
+import account.Account;
 import bank.Util;
 
 public class SuperUser extends User {
 
+	int empID;
+	private static final DAO<Account> ADAO = new AccountOracle();
+	
 	public void createUser() {
-		StringBuilder email = new StringBuilder();
-		StringBuilder fname = new StringBuilder();
-		StringBuilder lname = new StringBuilder();
+		String email = new String();
+		String fname = new String();
+		String lname = new String();
 		StringBuilder password = new StringBuilder();
 		String input;
 		int choice = 0;
 		System.out.println("Please enter the users email:");
-		email.append(Util.getInput().next());
-		if (User.getUserByEmail(this, email) != null) {
-			System.out.println("The user already exists, please enter a new email");
+		email = Util.getInput().next();
+		try {
+			if (User.getDao().getByID(email) != null) {
+				System.out.println("The user already exists, please enter a new email");
+				return;
+			}
+		} catch (Exception e1) {
+			System.out.println("Unable to access Database.");
 			return;
 		}
 		System.out.println("Please enter a the customer's first name.");
-		fname.append(Util.getInput().next());
-		fname = Util.cleanInput(fname);
+		fname = Util.getInput().next();
+		fname = Util.cleanInput(new StringBuilder(fname)).toString();
 		System.out.println("Please enter a the customer's last name.");
-		lname.append(Util.getInput().next());
-		lname = Util.cleanInput(lname);
+		lname = Util.getInput().next();
+		lname = Util.cleanInput(new StringBuilder(lname)).toString();
 		System.out.println("Please enter the users password");
 		password.append(Util.getInput().next());
 
@@ -37,10 +50,22 @@ public class SuperUser extends User {
 			}
 			switch (choice) {
 			case 1:
-				Customer.addUser(this, fname, lname, email, password);
+				User cust = new Customer(0, fname, lname, email, password);
+				try {
+					User.getDao().insertInto(cust);
+					System.out.println("Customer Created Sucessfully");
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 				break;
 			case 2:
-				addUser(this, fname, lname, email, password);
+				User emp = new Customer(0, fname, lname, email, password);
+				try {
+					User.getDao().insertInto(emp);
+					System.out.println("Admin Created Sucessfully");
+				} catch (Exception e) {
+					System.out.println(e.getMessage());
+				}
 				break;
 			default:
 				System.out.println("Please enter a valid option.");
@@ -54,12 +79,17 @@ public class SuperUser extends User {
 
 	// function called to unlock the user
 	public void unlockUser() {
-		StringBuilder email = new StringBuilder();
+		String email;
 		User lUser;
 		do {
 			System.out.println("Please enter the users email:");
-			email.append(Util.getInput().next());
-			lUser = User.getUserByEmail(this, email);
+			email = Util.getInput().next();
+			try {
+				lUser = User.getDao().getByID(email);
+			} catch (Exception e) {
+				System.out.println("Unable to Access DataBase");
+				return;
+			}
 			if (lUser == null) {
 				System.out.println("The user does not exist, please try again.");
 			} else {
@@ -68,33 +98,48 @@ public class SuperUser extends User {
 		} while (true);
 		
 		if (lUser.isLocked()) {
-			User.unlockUser(this, lUser);
-			System.out.println(lUser.getLname() + "'s account has been unlocked.");
+			lUser.setLocked(false);
+			try {
+				User.getDao().insertInto(lUser);
+				System.out.println(lUser.getFname() + " " + lUser.getLname() + "'s account has been unlocked.");
+			} catch (Exception e) {
+				System.out.println("Unable to unlock user.");
+			}
+			
 		} else {
 			System.out.println("The user is already unlocked.");
 		}
 	}
 	
 	public void seeTransactions() {
-		
-	}
-
-	private static boolean addUser(User admin, StringBuilder fname, StringBuilder lname, StringBuilder email,
-			StringBuilder password) {
-		if (admin instanceof SuperUser) {
-			User supUser = new SuperUser(fname, lname, email, password);
-			User.addUser(supUser);
-			return true;
-		}
-		System.out.println("You do not have permission to perform this action");
-		return false;
-	}
-
-	private SuperUser(StringBuilder fname, StringBuilder lname, StringBuilder email, StringBuilder password) {
-		super(fname, lname, email, password);
+		System.out.println("NYI");
 	}
 	
-	public static User login(StringBuilder email, StringBuilder password) {
+	public void SeeAccounts() {
+		ArrayList<Account> allAccounts;
+		try {
+			allAccounts = ADAO.getAll();
+		} catch (Exception e) {
+			System.out.println("Unable To get Accounts");
+			return;
+		}
+		for (Account account : allAccounts) {
+			System.out.println(account);
+		}
+	}
+
+	public SuperUser(int empID, String fname, String lname, String email, StringBuilder password) {
+		super(fname, lname, email, password);
+		this.empID = empID;
+		this.setLocked(false);
+	}
+	
+	@Override
+	public String toString() {
+		return "SuperUser [empID=" + empID + "]" + super.toString();
+	}
+
+	public static User login(String email, StringBuilder password) {
 		return null;
 	}
 

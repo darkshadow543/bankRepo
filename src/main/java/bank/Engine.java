@@ -5,13 +5,13 @@ import User.SuperUser;
 import User.User;
 
 public class Engine {
-
-	public void login() {
+	//login function, allows the user to quit if they want to.
+	public static void login() {
 		User currentUser;
-		StringBuilder email = new StringBuilder();
+		String email = new String();
 		do {
 			System.out.println("Please enter your email.");
-			email.append(Util.getInput().next());
+			email = Util.getInput().next();
 			currentUser = User.login(email);
 			if (currentUser == null) {
 				continue;
@@ -20,20 +20,22 @@ public class Engine {
 			} else if (currentUser instanceof Customer) {
 				CustomerIntf((Customer) currentUser);
 			} else {
-				System.out.println("You should never ever see this.");
+				System.out.println("I have no clue what you did, but this area of the dungeon should never have been found.");
 			}
-			if (this.askQuit()) {
+			if (Engine.askQuit()) {
 				break;
 			}
 		} while (true);
 
 	}
 
-	private void SuperUserIntf(SuperUser admin) {
+	//Admin Interface
+	private static void SuperUserIntf(SuperUser admin) {
 		int input = 0;
 		do {
+			System.out.println("Welcome " + admin.getFname() + " " + admin.getLname());
 			System.out.println("Please chose an option.\n1. Create a new User.\n2. Unlock a User.\n"
-					+ "3. See the Transactions of an Account.\n 4. Logout.");
+					+ "3. See the Transactions of an Account.\n4. See All Accounts \n5. Logout.");
 			try {
 				input = Integer.parseInt(Util.getInput().next());
 			} catch (Exception e) {
@@ -51,6 +53,10 @@ public class Engine {
 				admin.seeTransactions();
 				break;
 			case 4:
+				admin.SeeAccounts();
+				break;
+			case 5:
+				System.out.println("Logging out...");
 				return;
 			default:
 				System.out.println("Please enter a valid option!");
@@ -59,11 +65,13 @@ public class Engine {
 		} while (true);
 	}
 
-	private void CustomerIntf(Customer cust) {
+	//Customer interface
+	private static void CustomerIntf(Customer cust) {
 		int input = 0;
 		do {
+			System.out.println("Welcome " + cust.getFname() + " " + cust.getLname());
 			System.out.println("Please enter an option.\n1. Open an Account.\n2. Close an Account.\n3. Make a Deposit"
-					+ "\n4. Make a Withdrawl.\n 5. Logout");
+					+ "\n4. Make a Withdrawl.\n5. Check a Balance\n6. Logout");
 			try {
 				input = Integer.parseInt(Util.getInput().next());
 			} catch (Exception e) {
@@ -84,16 +92,19 @@ public class Engine {
 				cust.Withdraw();
 				break;
 			case 5:
+				cust.checkBalance();
+				break;
+			case 6:
+				System.out.println("Logging out...");
 				return;
 			default:
 				System.out.println("Please enter a valid option!");
 				continue;
 			}
-			break;
 		} while(true);
 	}
 
-	private boolean askQuit() {
+	private static boolean askQuit() {
 		String input;
 		do {
 			System.out.println("Would you like to continue? [Y/N]");

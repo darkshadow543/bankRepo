@@ -1,20 +1,24 @@
 package User;
 
-import java.util.HashMap;
-import java.util.Map;
 
+import DOA.DAO;
+import DOA.UserOracle;
 import bank.Util;
 
 public abstract class User {
 
-	private StringBuilder fname = new StringBuilder();
-	private StringBuilder lname = new StringBuilder();
-	private StringBuilder email = new StringBuilder();
+	private String fname; 
+	private String lname; 
+	private String email; 
 	private transient StringBuilder password = new StringBuilder();
 	private boolean isLocked = false;
-	private static Map<String, User> UserMap = new HashMap<String, User>();
+	private static final DAO<User> dao = new UserOracle(); 
 
-	protected User(StringBuilder fname, StringBuilder lname, StringBuilder email, StringBuilder password) {
+	public static DAO<User> getDao() {
+		return dao;
+	}
+
+	protected User(String fname, String lname, String email, StringBuilder password) {
 		this.fname = fname;
 		this.lname = lname;
 		this.email = email;
@@ -22,13 +26,12 @@ public abstract class User {
 	}
 
 	// Static user login;
-	public static User login(StringBuilder email) {
+	public static User login(String email) {
 		User user;
 		try {
-			user = (User) UserMap.get(email.toString());
+			user = dao.getByID(email);
 		} catch (Exception e) {
-			System.out.println(
-					"This error should not happen, if you are reading this, the returned object was not a user");
+			System.out.println("Unable to retrieve User");
 			return null;
 		}
 		if (user == null) {
@@ -44,26 +47,71 @@ public abstract class User {
 		do {
 			System.out.println("Please enter your password");
 			input.append(Util.getInput().next());
-			if (input.equals(user.getPassword())) {
+			if (user.getPassword().toString().equals(input.toString())) {
 				return user;
 			} else {
 				i++;
 				System.out.println("The password you have entered is wrong.");
-				System.out.println("You have " + (3 - i) + "attempts left.");
+				System.out.println("You have " + (3 - i) + " attempts left.");
 				input.delete(0, input.length());
 			}
 		} while (i < 3);
 		user.setLocked(true);
 		System.out.println("Your account has been locked.");
-		System.out.println("Please contact an administrator to unlock your account");
+		System.out.println("Please contact an administrator to unlock your account.");
+		try {
+		dao.insertInto(user); 
+		} catch (Exception e) {
+			System.out.println("Unable to access database.");
+		}
 		return null;
 	}
 
-	public StringBuilder getFname() {
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((email == null) ? 0 : email.hashCode());
+		result = prime * result + ((fname == null) ? 0 : fname.hashCode());
+		result = prime * result + (isLocked ? 1231 : 1237);
+		result = prime * result + ((lname == null) ? 0 : lname.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		User other = (User) obj;
+		if (email == null) {
+			if (other.email != null)
+				return false;
+		} else if (!email.equals(other.email))
+			return false;
+		if (fname == null) {
+			if (other.fname != null)
+				return false;
+		} else if (!fname.equals(other.fname))
+			return false;
+		if (isLocked != other.isLocked)
+			return false;
+		if (lname == null) {
+			if (other.lname != null)
+				return false;
+		} else if (!lname.equals(other.lname))
+			return false;
+		return true;
+	}
+
+	public String getFname() {
 		return fname;
 	}
 
-	public void setFname(StringBuilder fname) {
+	public void setFname(String fname) {
 		this.fname = fname;
 	}
 
@@ -75,19 +123,19 @@ public abstract class User {
 		this.password = password;
 	}
 
-	public StringBuilder getLname() {
+	public String getLname() {
 		return lname;
 	}
 
-	public void setLname(StringBuilder lname) {
+	public void setLname(String lname) {
 		this.lname = lname;
 	}
 
-	public StringBuilder getEmail() {
+	public String getEmail() {
 		return email;
 	}
 
-	public void setEmail(StringBuilder email) {
+	public void setEmail(String email) {
 		this.email = email;
 	}
 
@@ -99,30 +147,9 @@ public abstract class User {
 		this.isLocked = isLocked;
 	}
 
-	public static void unlockUser(User admin, User user) {
-		if (user == null) {
-			System.out.println("Please enter a user");
-			return;
-		}
-		if (admin instanceof SuperUser) {
-			user.setLocked(false);
-			return;
-		} else {
-			System.out.println("You do not have permission to use this funtion");
-			return;
-		}
-	}
-	
-	public static User getUserByEmail(User admin, StringBuilder email) {
-		User test = UserMap.get(email.toString());
-		if (test != null) {
-			return test;
-		}
-		return test;
-	}
-	
-	protected static void addUser(User user) {
-		UserMap.put(user.email.toString(), user);
+	@Override
+	public String toString() {
+		return "User [fname=" + fname + ", lname=" + lname + ", email=" + email + ", isLocked=" + isLocked + "]";
 	}
 
 }
