@@ -1,11 +1,11 @@
-package User;
+package user;
 
 import java.util.ArrayList;
 
-import DOA.AccountOracle;
-import DOA.DAO;
 import account.Account;
 import bank.Util;
+import dao.AccountOracle;
+import dao.DAO;
 
 public class SuperUser extends User {
 

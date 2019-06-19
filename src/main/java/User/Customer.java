@@ -1,11 +1,11 @@
-package User;
+package user;
 
 import java.util.ArrayList;
 
-import DOA.AccountOracle;
-import DOA.ChildTableDAO;
 import account.Account;
 import bank.Util;
+import dao.AccountOracle;
+import dao.ChildTableDAO;
 
 public class Customer extends User {
 

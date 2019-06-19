@@ -1,9 +1,9 @@
-package User;
+package user;
 
 
-import DOA.DAO;
-import DOA.UserOracle;
 import bank.Util;
+import dao.DAO;
+import dao.UserOracle;
 
 public abstract class User {
 
@@ -31,7 +31,7 @@ public abstract class User {
 		try {
 			user = dao.getByID(email);
 		} catch (Exception e) {
-			System.out.println("Unable to retrieve User");
+			System.out.println("Unable to retrieve user");
 			return null;
 		}
 		if (user == null) {
@@ -149,7 +149,7 @@ public abstract class User {
 
 	@Override
 	public String toString() {
-		return "User [fname=" + fname + ", lname=" + lname + ", email=" + email + ", isLocked=" + isLocked + "]";
+		return "user [fname=" + fname + ", lname=" + lname + ", email=" + email + ", isLocked=" + isLocked + "]";
 	}
 
 }

@@ -1,4 +1,4 @@
-package DOA;
+package dao;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,10 +9,10 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
-import User.Customer;
-import User.SuperUser;
-import User.User;
 import bank.Util;
+import user.Customer;
+import user.SuperUser;
+import user.User;
 
 public class UserOracle implements DAO<User> {
 

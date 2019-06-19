@@ -1,8 +1,8 @@
 package bank;
 
-import User.Customer;
-import User.SuperUser;
-import User.User;
+import user.Customer;
+import user.SuperUser;
+import user.User;
 
 public class Engine {
 	//login function, allows the user to quit if they want to.
@@ -34,7 +34,7 @@ public class Engine {
 		int input = 0;
 		do {
 			System.out.println("Welcome " + admin.getFname() + " " + admin.getLname());
-			System.out.println("Please chose an option.\n1. Create a new User.\n2. Unlock a User.\n"
+			System.out.println("Please chose an option.\n1. Create a new user.\n2. Unlock a user.\n"
 					+ "3. See the Transactions of an Account.\n4. See All Accounts \n5. Logout.");
 			try {
 				input = Integer.parseInt(Util.getInput().next());
